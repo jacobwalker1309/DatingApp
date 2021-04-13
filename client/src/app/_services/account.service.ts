@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
@@ -8,7 +9,7 @@ import { User } from '../_models/user';
 })
 export class AccountService {
 
-  baseUrl = "https://localhost:5001/api/";
+  baseUrl = environment.apiUrl;
   private currentUserSource = new ReplaySubject<User>(1);
   // replay subject is a buffer object, anytime some subscribes to it, it will emit, last or any value
   currentUser$ = this.currentUserSource.asObservable();
@@ -22,7 +23,7 @@ export class AccountService {
       map((response:User)=>{
         const user = response;
         if(user){
-          localStorage.setItem('User', JSON.stringify(user));
+          localStorage.setItem('user', JSON.stringify(user));
           this.currentUserSource.next(user);
         }
       })
