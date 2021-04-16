@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using API.Extensions;
+using API.Helpers;
 
 namespace API.Controllers
 {
@@ -34,9 +35,17 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDTO>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDTO>>> GetUsers([FromQuery] UserParams userParams)
         {
-            var users = await _userRepository.GetMembersAsync();
+            var user = await _userRepository.GetUserByUserNameAsync(User.GetUsername());
+            userParams.CurrentUsername = user.UserName;
+
+            if(string.IsNullOrEmpty(userParams.Gender))
+            userParams.Gender = user.Gender == "male"? "female":"male";
+
+            var users = await _userRepository.GetMembersAsync(userParams);
+
+            Response.AddPaginationHeader(users.CurrentPage,users.PageSize,users.TotalCount, users.TotalPages);
 
             // var users = await _userRepository.GetUsersAsync();
 
@@ -54,7 +63,8 @@ namespace API.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDTO memberUpdateDTO)
         {
-            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+            var username = claimsIdentity.Name;
             var user = await _userRepository.GetUserByUserNameAsync(username);
             _mapper.Map(memberUpdateDTO, user);
             _userRepository.Update(user);
