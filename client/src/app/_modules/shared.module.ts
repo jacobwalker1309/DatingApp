@@ -10,6 +10,7 @@ import {PaginationModule} from 'ngx-bootstrap/pagination';
 import {ButtonsModule} from 'ngx-bootstrap/buttons';
 import { Button } from 'selenium-webdriver';
 import { TimeagoModule } from 'ngx-timeago';
+import {ModalModule} from 'ngx-bootstrap/modal';
 
 @NgModule({
   declarations: [],
@@ -25,7 +26,8 @@ import { TimeagoModule } from 'ngx-timeago';
     BsDatepickerModule.forRoot(),
     PaginationModule.forRoot(),
     ButtonsModule.forRoot(),
-    TimeagoModule.forRoot()
+    TimeagoModule.forRoot(),
+    ModalModule.forRoot()
   ],
   exports:[
     BsDropdownModule,
