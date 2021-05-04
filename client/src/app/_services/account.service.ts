@@ -1,3 +1,4 @@
+import { PresenceService } from './presence.service';
 import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -13,7 +14,7 @@ export class AccountService {
   private currentUserSource = new ReplaySubject<User>(1);
   // replay subject is a buffer object, anytime some subscribes to it, it will emit, last or any value
   currentUser$ = this.currentUserSource.asObservable();
-  constructor(private http: HttpClient) 
+  constructor(private http: HttpClient, private presence:PresenceService) 
   { 
 
   }
@@ -24,6 +25,7 @@ export class AccountService {
         const user = response;
         if(user){
          this.setCurrentUser(user);
+         this.presence.createHubConnection(user);
         }
       })
     );
@@ -34,6 +36,7 @@ export class AccountService {
       map((user:User) => {
         if(user){
          this.setCurrentUser(user);
+         this.presence.createHubConnection(user);
         }
         return user;
       })
@@ -51,6 +54,7 @@ export class AccountService {
   logout(){
     localStorage.removeItem('user');
     this.currentUserSource.next(null);
+    this.presence.stopHubConnection();
   }
 
   getDecodedToken(token){
