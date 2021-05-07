@@ -10,7 +10,7 @@ export function getPaginatedResult<T>(url,params, http:HttpClient) {
         paginatedResult.result = response.body;
        
         if (response.headers.get('Pagination') !== null) {
-         console.log("hi");
+         
           paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
           
         }
