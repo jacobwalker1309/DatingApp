@@ -25,9 +25,7 @@ namespace API.Extensions
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
             services.AddDbContext<DataContext>(options =>
             {
-                services.AddDbContext<DataContext>(options =>
-{
-    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
     string connStr;
 
@@ -40,7 +38,7 @@ namespace API.Extensions
     }
     else
     {
-       
+        // Use connection string provided at runtime by Heroku.
         var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
         // Parse connection URL to connection string for Npgsql
@@ -54,15 +52,12 @@ namespace API.Extensions
         var pgHost = pgHostPort.Split(":")[0];
         var pgPort = pgHostPort.Split(":")[1];
 
-        connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};sslmode=Prefer;Trust Server Certificate=true;";
+        connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SSL Mode=Require;TrustServerCertificate=True";
     }
 
     // Whether the connection string came from the local development configuration file
     // or from the environment variable from Heroku, use it to set up your DbContext.
     options.UseNpgsql(connStr);
-});
-
-                
             });
 
             return services;
