@@ -96,10 +96,10 @@ namespace API.Data
             && m.Sender.UserName == currentUsername && m.SenderDeleted == false
             
             ).OrderBy(m => m.MessageSent)
-            .ToListAsync();
+            .ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync();
             
             var unreadMessages = messages.Where(m => m.DateRead == null &&
-            m.Recipient.UserName == currentUsername).ToList();
+            m.RecipientUsername == currentUsername).ToList();
 
             if(unreadMessages.Any())
             {
@@ -108,10 +108,9 @@ namespace API.Data
                     message.DateRead = DateTime.UtcNow;
                 }
 
-                await _context.SaveChangesAsync();
             }
 
-            return _mapper.Map<IEnumerable<MessageDTO>>(messages);
+            return messages;
         }
 
         public void RemoveConnection(Connection connection)
@@ -119,9 +118,5 @@ namespace API.Data
             _context.Connections.Remove(connection);
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;
-        }
     }
 }
